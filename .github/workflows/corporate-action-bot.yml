@@ -1,0 +1,61 @@
+# Runs every 30 minutes on GitHub's servers (free). No need to keep your Mac on.
+name: Corporate Action Alert Bot
+
+on:
+  schedule:
+    # Every 30 minutes (UTC). IST = UTC+5:30.
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+    inputs:
+      bootstrap:
+        description: "Mark today's announcements as seen (no Telegram alerts)"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  check-announcements:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Restore dedup state
+        uses: actions/cache@v4
+        with:
+          path: sent_corporate_actions.json
+          key: sent-corporate-actions-v1
+          restore-keys: |
+            sent-corporate-actions-v1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Bootstrap (first-time only)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.bootstrap }}
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          MIN_PERCENT_GAIN: ${{ vars.MIN_PERCENT_GAIN || '0.2' }}
+          LOOKBACK_DAYS: ${{ vars.LOOKBACK_DAYS || '1' }}
+        run: python dividend_bot.py --bootstrap
+
+      - name: Check NSE & BSE and send alerts
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.bootstrap) }}
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          MIN_PERCENT_GAIN: ${{ vars.MIN_PERCENT_GAIN || '0.2' }}
+          LOOKBACK_DAYS: ${{ vars.LOOKBACK_DAYS || '1' }}
+          ALERT_DIVIDENDS: ${{ vars.ALERT_DIVIDENDS || 'true' }}
+          ALERT_OTHER_CA: ${{ vars.ALERT_OTHER_CA || 'true' }}
+        run: python dividend_bot.py --once

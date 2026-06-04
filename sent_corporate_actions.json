@@ -1,0 +1,395 @@
+{
+  "NSE_RALLIS_2026-06-04": {
+    "sent_at": "2026-06-04T22:14:20.971138",
+    "yield": 1.3
+  },
+  "NSE_TIIL_2026-06-04": {
+    "sent_at": "2026-06-04T22:14:22.829713",
+    "yield": 0.8
+  },
+  "BSE_RALLIS_2026-06-04": {
+    "sent_at": "2026-06-04T22:14:24.670969",
+    "yield": 1.3
+  },
+  "BSE_TIIL_2026-06-04": {
+    "sent_at": "2026-06-04T22:14:26.574669",
+    "yield": 0.8
+  },
+  "RALLIS_2026-06-04": {
+    "sent_at": "2026-06-04T22:14:48.137431",
+    "yield": 1.3
+  },
+  "TIIL_2026-06-04": {
+    "sent_at": "2026-06-04T22:14:50.017269",
+    "yield": 0.8
+  },
+  "ACC_b00c4d4cbb63": {
+    "bootstrapped_at": "2026-06-04T22:18:25.381995"
+  },
+  "ORIENTCEM_0a67d36836ab": {
+    "bootstrapped_at": "2026-06-04T22:18:25.382452"
+  },
+  "AMBUJACEM_e7630c1984b7": {
+    "bootstrapped_at": "2026-06-04T22:18:25.383235"
+  },
+  "HGS_1933f1adb5d7": {
+    "bootstrapped_at": "2026-06-04T22:18:25.383808"
+  },
+  "PILANIINVS_9a4c45b61c06": {
+    "bootstrapped_at": "2026-06-04T22:18:25.384399"
+  },
+  "ROLEXRINGS_68b5dcc07b52": {
+    "bootstrapped_at": "2026-06-04T22:18:25.384938"
+  },
+  "RALLIS_5d12e70c03f8": {
+    "bootstrapped_at": "2026-06-04T22:18:25.385591"
+  },
+  "TIIL_b4a2a8352ab1": {
+    "bootstrapped_at": "2026-06-04T22:18:25.386245"
+  },
+  "TRENT_ec79cf839528": {
+    "bootstrapped_at": "2026-06-04T22:18:25.386764"
+  },
+  "ACI_1635fbd21aaa": {
+    "bootstrapped_at": "2026-06-04T22:18:25.387299"
+  },
+  "BANKBARODA_428308ff2fcb": {
+    "bootstrapped_at": "2026-06-04T22:18:25.387752"
+  },
+  "BEML_41fc4107782a": {
+    "bootstrapped_at": "2026-06-04T22:18:25.388121"
+  },
+  "CIPLA_ad41ffb2e25b": {
+    "bootstrapped_at": "2026-06-04T22:18:25.388477"
+  },
+  "HDFCAMC_cdee3c71ecf2": {
+    "bootstrapped_at": "2026-06-04T22:18:25.388867"
+  },
+  "ICICIPRULI_85c3df1ecb9c": {
+    "bootstrapped_at": "2026-06-04T22:18:25.389221"
+  },
+  "JAGRAN_d3d0e4a05dcf": {
+    "bootstrapped_at": "2026-06-04T22:18:25.389571"
+  },
+  "JAGRAN_6d77edb199b3": {
+    "bootstrapped_at": "2026-06-04T22:18:25.389900"
+  },
+  "JSWENERGY_1697e5b89b41": {
+    "bootstrapped_at": "2026-06-04T22:18:25.390362"
+  },
+  "MAHABANK_2577ed8a08bc": {
+    "bootstrapped_at": "2026-06-04T22:18:25.390702"
+  },
+  "MKVENTURES_5c4a24d6f008": {
+    "bootstrapped_at": "2026-06-04T22:18:25.391060"
+  },
+  "PONNIERODE_8eee79652f7c": {
+    "bootstrapped_at": "2026-06-04T22:18:25.391491"
+  },
+  "QGO_6bac04531a01": {
+    "bootstrapped_at": "2026-06-04T22:18:25.391995"
+  },
+  "RELIANCE_73355f436f9b": {
+    "bootstrapped_at": "2026-06-04T22:18:25.392438"
+  },
+  "WIPRO_864d6a85b1c1": {
+    "bootstrapped_at": "2026-06-04T22:18:25.392822"
+  },
+  "UNIFIED_7ae3cc515e0d": {
+    "bootstrapped_at": "2026-06-04T22:18:25.393293"
+  },
+  "INOXINDIA_9e4dceeb380c": {
+    "bootstrapped_at": "2026-06-04T22:18:25.393776"
+  },
+  "NELCO_4026e0da5890": {
+    "bootstrapped_at": "2026-06-04T22:18:25.394187"
+  },
+  "GEL_9a789fbc5d13": {
+    "bootstrapped_at": "2026-06-04T22:18:25.394585"
+  },
+  "INDIANB_e90d8018ba69": {
+    "bootstrapped_at": "2026-06-04T22:18:25.394945"
+  },
+  "INFY_681d67cad8bd": {
+    "bootstrapped_at": "2026-06-04T22:18:25.395302"
+  },
+  "SESHAPAPER_6411ba06f05a": {
+    "bootstrapped_at": "2026-06-04T22:18:25.395677"
+  },
+  "TATACHEM_043b9ec95a6d": {
+    "bootstrapped_at": "2026-06-04T22:18:25.396008"
+  },
+  "TATAELXSI_b585093aa304": {
+    "bootstrapped_at": "2026-06-04T22:18:25.396358"
+  },
+  "TATAINVEST_759a1a9e601b": {
+    "bootstrapped_at": "2026-06-04T22:18:25.396696"
+  },
+  "SUNSHIEL_333f58f2efa2": {
+    "bootstrapped_at": "2026-06-04T22:18:25.397038"
+  },
+  "ACC_68c7170590b0": {
+    "bootstrapped_at": "2026-06-04T22:18:25.397369"
+  },
+  "ADANIENT_f94ac7c42d4e": {
+    "bootstrapped_at": "2026-06-04T22:18:25.397694"
+  },
+  "ADANIPORTS_0585aa8926ec": {
+    "bootstrapped_at": "2026-06-04T22:18:25.398049"
+  },
+  "AMBUJACEM_89ed7f058d12": {
+    "bootstrapped_at": "2026-06-04T22:18:25.398363"
+  },
+  "APCOTEXIND_7200f0e34733": {
+    "bootstrapped_at": "2026-06-04T22:18:25.398687"
+  },
+  "ATGL_86ce73526fd8": {
+    "bootstrapped_at": "2026-06-04T22:18:25.399029"
+  },
+  "AVANTEL_9a76ee10af8a": {
+    "bootstrapped_at": "2026-06-04T22:18:25.399341"
+  },
+  "CANBK_3ffb14bbe556": {
+    "bootstrapped_at": "2026-06-04T22:18:25.399662"
+  },
+  "CEMPRO_354aa3534c6d": {
+    "bootstrapped_at": "2026-06-04T22:18:25.399991"
+  },
+  "CUB_13bc4d9228fc": {
+    "bootstrapped_at": "2026-06-04T22:18:25.400317"
+  },
+  "EIMCOELECO_b2b8720d2d05": {
+    "bootstrapped_at": "2026-06-04T22:18:25.400649"
+  },
+  "ELECON_5b9185ffd288": {
+    "bootstrapped_at": "2026-06-04T22:18:25.400986"
+  },
+  "HIGHENE_b42a9d695ad5": {
+    "bootstrapped_at": "2026-06-04T22:18:25.401331"
+  },
+  "ICICIAMC_ec3b43ef0c0f": {
+    "bootstrapped_at": "2026-06-04T22:18:25.401662"
+  },
+  "JMFINANCIL_c4e2961d50bd": {
+    "bootstrapped_at": "2026-06-04T22:18:25.402007"
+  },
+  "LLOYDSME_dbbb2e843bea": {
+    "bootstrapped_at": "2026-06-04T22:18:25.402520"
+  },
+  "MMFL_6bfd59cf4457": {
+    "bootstrapped_at": "2026-06-04T22:18:25.402974"
+  },
+  "MOBAVENUE_f7a6c5cdaf14": {
+    "bootstrapped_at": "2026-06-04T22:18:25.403375"
+  },
+  "NAVINFLUOR_87e1e3ceccb8": {
+    "bootstrapped_at": "2026-06-04T22:18:25.403863"
+  },
+  "ORIENTCEM_c357a1e77fc9": {
+    "bootstrapped_at": "2026-06-04T22:18:25.404264"
+  },
+  "OSEASPR_8bd00923527e": {
+    "bootstrapped_at": "2026-06-04T22:18:25.404622"
+  },
+  "PANCHSHEEL_b38715596923": {
+    "bootstrapped_at": "2026-06-04T22:18:25.404969"
+  },
+  "PETRONET_56e66840f5bc": {
+    "bootstrapped_at": "2026-06-04T22:18:25.405303"
+  },
+  "PIRAMALFIN_b3cea1470349": {
+    "bootstrapped_at": "2026-06-04T22:18:25.405627"
+  },
+  "PNB_141d73543f35": {
+    "bootstrapped_at": "2026-06-04T22:18:25.405939"
+  },
+  "RIIL_a59560253c17": {
+    "bootstrapped_at": "2026-06-04T22:18:25.406286"
+  },
+  "TATASTEEL_0c2388efff40": {
+    "bootstrapped_at": "2026-06-04T22:18:25.406627"
+  },
+  "TECHCON_ee618ab712e1": {
+    "bootstrapped_at": "2026-06-04T22:18:25.406936"
+  },
+  "TMCV_a63fe9e33bf6": {
+    "bootstrapped_at": "2026-06-04T22:18:25.407240"
+  },
+  "TRENT_932a30c33ca7": {
+    "bootstrapped_at": "2026-06-04T22:18:25.407561"
+  },
+  "VOLTAS_ec03f64d250b": {
+    "bootstrapped_at": "2026-06-04T22:18:25.407879"
+  },
+  "SMCGLOBAL_1f298fe48973": {
+    "bootstrapped_at": "2026-06-04T22:18:25.408182"
+  },
+  "RRKABEL_f0f21c1b9328": {
+    "bootstrapped_at": "2026-06-04T22:18:25.408500"
+  },
+  "CAPITALSFB_4f37b60999d9": {
+    "bootstrapped_at": "2026-06-04T22:18:25.408812"
+  },
+  "EMUDHRA_db8c0d1da439": {
+    "bootstrapped_at": "2026-06-04T22:18:25.409124"
+  },
+  "GHCL_47363a0fb4da": {
+    "bootstrapped_at": "2026-06-04T22:18:25.409438"
+  },
+  "HDBFS_3f8ca344b971": {
+    "bootstrapped_at": "2026-06-04T22:18:25.409737"
+  },
+  "MONIKA_a153338cc11c": {
+    "bootstrapped_at": "2026-06-04T22:18:25.410042"
+  },
+  "SWASTIKA_6114225690e7": {
+    "bootstrapped_at": "2026-06-04T22:18:25.410455"
+  },
+  "TATATECH_355641c14bfd": {
+    "bootstrapped_at": "2026-06-04T22:18:25.410894"
+  },
+  "TATATECH_d0db991643b1": {
+    "bootstrapped_at": "2026-06-04T22:18:25.411305"
+  },
+  "VIMTALABS_6f688af189bb": {
+    "bootstrapped_at": "2026-06-04T22:18:25.411640"
+  },
+  "AEL_8bee39355d85": {
+    "bootstrapped_at": "2026-06-04T22:18:25.412050"
+  },
+  "AWL_9bf046f9b6eb": {
+    "bootstrapped_at": "2026-06-04T22:18:25.412395"
+  },
+  "CORONA_e7c6e358c463": {
+    "bootstrapped_at": "2026-06-04T22:18:25.412723"
+  },
+  "GHCLTEXTIL_89b62ad415a2": {
+    "bootstrapped_at": "2026-06-04T22:18:25.413064"
+  },
+  "HDFCBANK_3e88ce51b2b5": {
+    "bootstrapped_at": "2026-06-04T22:18:25.413406"
+  },
+  "HDFCLIFE_c260ceccb295": {
+    "bootstrapped_at": "2026-06-04T22:18:25.413724"
+  },
+  "HIIL_36dfc86762b9": {
+    "bootstrapped_at": "2026-06-04T22:18:25.414057"
+  },
+  "INDIAMART_3b6bc527edfe": {
+    "bootstrapped_at": "2026-06-04T22:18:25.414361"
+  },
+  "INDIAMART_34a08276364e": {
+    "bootstrapped_at": "2026-06-04T22:18:25.414661"
+  },
+  "RPEL_d030965b2248": {
+    "bootstrapped_at": "2026-06-04T22:18:25.414962"
+  },
+  "SANOFICONR_44c04a67ff3a": {
+    "bootstrapped_at": "2026-06-04T22:18:25.415317"
+  },
+  "SOLIMAC_a97e40c42d5e": {
+    "bootstrapped_at": "2026-06-04T22:18:25.415694"
+  },
+  "TATACOMM_128d6f7b7a4e": {
+    "bootstrapped_at": "2026-06-04T22:18:25.416040"
+  },
+  "TMPV_acce302d49dc": {
+    "bootstrapped_at": "2026-06-04T22:18:25.416359"
+  },
+  "PANCARBON_2a38c4b30d0f": {
+    "bootstrapped_at": "2026-06-04T22:18:25.416737"
+  },
+  "ASIANPAINT_92f58bccd9fa": {
+    "bootstrapped_at": "2026-06-04T22:18:25.417105"
+  },
+  "DALBHARAT_2ac3950b77d5": {
+    "bootstrapped_at": "2026-06-04T22:18:25.417416"
+  },
+  "GNA_79ef73354b4d": {
+    "bootstrapped_at": "2026-06-04T22:18:25.417732"
+  },
+  "HINDUNILVR_100096024a14": {
+    "bootstrapped_at": "2026-06-04T22:18:25.418024"
+  },
+  "INDHOTEL_ff77addf3384": {
+    "bootstrapped_at": "2026-06-04T22:18:25.418393"
+  },
+  "TATAPOWER_c4c043681f13": {
+    "bootstrapped_at": "2026-06-04T22:18:25.418757"
+  },
+  "BUILDPRO_327ec9b6cd0a": {
+    "bootstrapped_at": "2026-06-04T22:18:25.419155"
+  },
+  "WHEELS_82f0b9324b6b": {
+    "bootstrapped_at": "2026-06-04T22:18:25.419481"
+  },
+  "ABDL_f0c080a3ba70": {
+    "bootstrapped_at": "2026-06-04T22:18:25.419805"
+  },
+  "ALKYLAMINE_0bd277074aa5": {
+    "bootstrapped_at": "2026-06-04T22:18:25.420102"
+  },
+  "ANTHEM_82190753dc12": {
+    "bootstrapped_at": "2026-06-04T22:18:25.420421"
+  },
+  "CARERATING_c4616c09af60": {
+    "bootstrapped_at": "2026-06-04T22:18:25.420720"
+  },
+  "GICHSGFIN_52b71fcaa099": {
+    "bootstrapped_at": "2026-06-04T22:18:25.421004"
+  },
+  "INDUSINDBK_696ace35fa80": {
+    "bootstrapped_at": "2026-06-04T22:18:25.421298"
+  },
+  "LALPATHLAB_3d7d35813d0c": {
+    "bootstrapped_at": "2026-06-04T22:18:25.421590"
+  },
+  "LICI_7a7b23696ae8": {
+    "bootstrapped_at": "2026-06-04T22:18:25.421879"
+  },
+  "NAM-INDIA_e288b84db4d9": {
+    "bootstrapped_at": "2026-06-04T22:18:25.422172"
+  },
+  "SJS_8ac319599732": {
+    "bootstrapped_at": "2026-06-04T22:18:25.422453"
+  },
+  "SONACOMS_1c9ccbe16760": {
+    "bootstrapped_at": "2026-06-04T22:18:25.422750"
+  },
+  "SUPREMEIND_0e8f11c62226": {
+    "bootstrapped_at": "2026-06-04T22:18:25.423044"
+  },
+  "SYNGENE_f4d66b8c69b2": {
+    "bootstrapped_at": "2026-06-04T22:18:25.423334"
+  },
+  "UFLEX_a062d605133e": {
+    "bootstrapped_at": "2026-06-04T22:18:25.423615"
+  },
+  "VAIBHAVGBL_4d6d6b1a071a": {
+    "bootstrapped_at": "2026-06-04T22:18:25.423906"
+  },
+  "VISAKAIND_0392a6a6723e": {
+    "bootstrapped_at": "2026-06-04T22:18:25.424200"
+  },
+  "JYOTHYLAB_25da45311e3d": {
+    "bootstrapped_at": "2026-06-04T22:18:25.424503"
+  },
+  "KANSAINER_941e6bca8c79": {
+    "bootstrapped_at": "2026-06-04T22:18:25.424784"
+  },
+  "BAJAJFINSV_23f7147a93fd": {
+    "bootstrapped_at": "2026-06-04T22:18:25.425067"
+  },
+  "BAJAJHLDNG_049246aa2187": {
+    "bootstrapped_at": "2026-06-04T22:18:25.425344"
+  },
+  "BAJAJHLDNG_590d25eb4199": {
+    "bootstrapped_at": "2026-06-04T22:18:25.425625"
+  },
+  "BAJFINANCE_fcdb8885a631": {
+    "bootstrapped_at": "2026-06-04T22:18:25.425900"
+  },
+  "MAHSCOOTER_78602dec3fb7": {
+    "bootstrapped_at": "2026-06-04T22:18:25.426175"
+  }
+}
