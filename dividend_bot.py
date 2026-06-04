@@ -11,10 +11,16 @@ from datetime import datetime, date, timedelta
 from telegram import Bot
 import asyncio
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-# ─── CONFIG (override via environment variables) ─────────────────────────────
+# ─── CONFIG — .env locally, or GitHub Actions secrets/variables ──────────────
 def _env_float(name: str, default: float) -> float:
     return float(os.environ.get(name, default))
 
@@ -469,14 +475,29 @@ def bootstrap_seen():
     logger.info(f"Bootstrap complete — marked {len(nse_ann) + len(bse_items)} items as seen")
 
 
+def log_config():
+    logger.info(
+        "Config: MIN_PERCENT_GAIN=%s LOOKBACK_DAYS=%s POLL_MINUTES=%s "
+        "ALERT_DIVIDENDS=%s ALERT_OTHER_CA=%s",
+        MIN_PERCENT_GAIN,
+        LOOKBACK_DAYS,
+        POLL_MINUTES,
+        ALERT_DIVIDENDS,
+        ALERT_OTHER_CA,
+    )
+
+
 def validate_config():
     if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
-        logger.error("Set TELEGRAM_TOKEN and TELEGRAM_CHAT_ID environment variables.")
+        logger.error(
+            "Set TELEGRAM_TOKEN and TELEGRAM_CHAT_ID in .env or environment variables."
+        )
         sys.exit(1)
 
 
 if __name__ == "__main__":
     validate_config()
+    log_config()
     logger.info("Corporate Action Alert Bot started.")
 
     if "--bootstrap" in sys.argv:
