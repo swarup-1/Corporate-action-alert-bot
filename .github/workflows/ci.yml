@@ -22,7 +22,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci || npm install
+        run: npm ci
 
       - name: Verify server loads
         run: node -e "require('./src/app'); require('./api/index'); console.log('OK')"
