@@ -1,228 +1,58 @@
-# Corporate Action Alert Bot
+# Investment API
 
-A Python bot that watches **NSE** and **BSE** for new **corporate action** announcements (dividends, bonus, splits, buybacks, and more), applies your filters, and sends **Telegram** alerts. It can run on **GitHub Actions** every 30 minutes so your computer does not need to stay on.
+Simple Express + MongoDB backend for the dividend alerts dashboard.
 
----
-
-## How this bot works
-
-### High-level flow
-
-```mermaid
-flowchart TD
-  A[Every 30 min — GitHub Actions or local loop] --> B[Load config from .env or GitHub Variables]
-  B --> C[Fetch NSE corporate announcements]
-  B --> D[Fetch BSE corporate actions feed]
-  C --> E[Filter: corporate-action keywords]
-  D --> E
-  E --> F[Skip if already in sent_corporate_actions.json]
-  F --> G{Dividend?}
-  G -->|Yes| H[Get CMP from Yahoo Finance]
-  H --> I{Yield >= MIN_PERCENT_GAIN?}
-  I -->|Yes| J[Send Telegram alert]
-  I -->|No| K[Skip]
-  G -->|Other CA| L{ALERT_OTHER_CA enabled?}
-  L -->|Yes| J
-  L -->|No| K
-  J --> M[Save dedup key — no repeat alert]
-```
-
-### Step by step
-
-1. **Poll exchanges**  
-   On each run the bot asks NSE and BSE for corporate actions / announcements posted in the last **`LOOKBACK_DAYS`** (default: today only).
-
-2. **Filter relevant items**  
-   It keeps rows whose text mentions things like dividend, bonus, split, buyback, rights, merger, AGM, book closure, etc.
-
-3. **Deduplicate**  
-   Each announcement gets a stable id (exchange + symbol + action type + ex-date + subject). If that id is already in **`sent_corporate_actions.json`**, the bot skips it so you are not spammed on the next run.
-
-4. **Apply your rules**  
-   - **Dividends** (`ALERT_DIVIDENDS=true`): parse ₹ amount from the notice, fetch **current market price (CMP)**, compute **yield = dividend ÷ CMP × 100**. Alert only if yield ≥ **`MIN_PERCENT_GAIN`**.  
-   - **Other actions** (bonus, split, buyback, …): if **`ALERT_OTHER_CA=true`**, alert as soon as the announcement is new (no yield check).
-
-5. **Notify**  
-   Matching items are sent to your Telegram chat via your bot token.
-
-6. **Remember**  
-   The dedup file is updated so the same announcement never triggers twice.
-
-### Where data comes from
-
-| Exchange | Source | What the date window means |
-|----------|--------|----------------------------|
-| **NSE** | Corporate **announcements** API | Filings in the last `LOOKBACK_DAYS` |
-| **NSE** | Corporate **actions** calendar (for dividends) | Used to enrich dividend ₹ amount and ex-date when the announcement text is short |
-| **BSE** | Corporate actions **DefaultData** API | Listings in the last `LOOKBACK_DAYS` |
-
-The bot alerts on **new listings/announcements**, not only stocks whose ex-date is today. Ex-date and record date are shown in the message when available.
-
-### Example Telegram alert
-
-```
-🔔 New Corporate Action — NSE
-
-📌 Type: Dividend
-🏢 Company: Rallis India Limited
-📊 Symbol: RALLIS
-💰 Dividend: ₹3.00 per share
-📈 CMP: ₹230.15
-🎯 Yield: 1.30%
-📅 Ex-Date: 04-Jun-2026
-📅 Record Date: 04-Jun-2026
-🔍 Details: Dividend - Rs 3 Per Share
-```
-
----
-
-## Configuration
-
-All settings are **environment variables** — no code edits needed.
-
-### Local: `.env` file
+## Setup
 
 ```bash
+npm install
 cp .env.example .env
-# edit .env, then:
-python dividend_bot.py --once
+# Edit .env — set MONGODB_URI (MongoDB Atlas)
+npm run dev
 ```
 
-### GitHub: Secrets + Variables
+API: http://localhost:5000/api
 
-**Settings → Secrets and variables → Actions**
+## MongoDB Atlas (free)
 
-| Type | Name | Description |
-|------|------|-------------|
-| Secret | `TELEGRAM_TOKEN` | Bot token from [@BotFather](https://t.me/BotFather) |
-| Secret | `TELEGRAM_CHAT_ID` | Your numeric chat id |
-| Variable | `MIN_PERCENT_GAIN` | Minimum dividend yield % (e.g. `0.2`, `1`, `3`) |
-| Variable | `LOOKBACK_DAYS` | How many days back to scan (usually `1`) |
-| Variable | `ALERT_DIVIDENDS` | `true` / `false` — dividend alerts with yield rule |
-| Variable | `ALERT_OTHER_CA` | `true` / `false` — bonus, split, buyback, etc. |
-| Variable | `POLL_MINUTES` | Only used for **local** loop (GitHub cron is fixed at 30 min) |
+1. Create free cluster at [mongodb.com/atlas](https://www.mongodb.com/cloud/atlas)
+2. Database Access → create user
+3. Network Access → allow `0.0.0.0/0` (dev)
+4. Connect → Drivers → copy connection string into `.env`
 
-### What each setting does
+If Atlas is unreachable (office firewall), the API still starts and serves **live** dividend data without saving to DB.
 
-| Variable | Default | Effect |
-|----------|---------|--------|
-| `MIN_PERCENT_GAIN` | `0.2` | For **dividends only**: alert if `(dividend ÷ CMP) × 100` is at least this percent. |
-| `LOOKBACK_DAYS` | `1` | Scan announcements from the last N calendar days. Use `2` if runs sometimes fail overnight. |
-| `ALERT_DIVIDENDS` | `true` | Turn dividend alerts on or off. |
-| `ALERT_OTHER_CA` | `true` | If `true`, also alert on bonus, split, buyback, rights, merger, AGM, etc. If `false`, **dividends only**. |
-| `POLL_MINUTES` | `30` | Local mode: minutes between checks when running `python dividend_bot.py` without `--once`. |
+## Env
 
-**Quiet setup (dividends only, 1% yield):**
+| Variable | Description |
+|----------|-------------|
+| `MONGODB_URI` | Atlas connection string |
+| `LOOKBACK_DAYS` | Days of announcements to fetch (default 7) |
+| `ALLOW_INSECURE_SSL` | `true` on corporate networks with SSL inspection |
 
-```env
-ALERT_OTHER_CA=false
-MIN_PERCENT_GAIN=1
-LOOKBACK_DAYS=1
-```
+## Endpoints
 
----
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/health` | Health check |
+| GET | `/api/dividends` | List dividends |
+| GET | `/api/dividends?refresh=true` | Refresh from NSE/BSE |
 
-## Commands
+## Deploy (Vercel)
 
-| Command | Purpose |
-|---------|---------|
-| `python dividend_bot.py --once` | Single check (used by GitHub Actions) |
-| `python dividend_bot.py --bootstrap` | Mark everything in the current window as “seen” — **no Telegram** (use once after deploy) |
-| `python dividend_bot.py` | Run forever, poll every `POLL_MINUTES` |
+See [../DEPLOY.md](../DEPLOY.md) for full steps. Quick summary:
 
----
+1. Push this repo to GitHub  
+2. Import on [Vercel](https://vercel.com/new)  
+3. Set env: `MONGODB_URI`, `LOOKBACK_DAYS`, `CLIENT_URL`  
+4. API URL: `https://<project>.vercel.app/api`
 
-## Deploy on GitHub Actions (recommended)
-
-Your Mac can be off. GitHub runs the bot on a schedule.
-
-### 1. Push this repo
 
 ```bash
-cd dividend-alert-bot
-git init
-git add .
-git commit -m "Corporate action alert bot"
-git remote add origin https://github.com/YOUR_USER/Corporate-action-alert-bot.git
-git push -u origin main
+# Terminal 1
+npm run dev
+
+# Terminal 2
+cd ../investment-dashboard
+npm run dev
 ```
-
-Repo must contain `dividend_bot.py`, `requirements.txt`, and `.github/workflows/corporate-action-bot.yml` at the **root**.
-
-### 2. Add secrets and variables
-
-See [Configuration](#configuration) above.
-
-### 3. Enable Actions
-
-Open the **Actions** tab and enable workflows if GitHub asks.
-
-### 4. First run (avoid hundreds of alerts)
-
-**Actions → Corporate Action Alert Bot → Run workflow**
-
-- Enable **bootstrap** → **Run workflow**  
-  This saves today’s NSE/BSE items as already seen without sending Telegram messages.
-
-### 5. Ongoing runs
-
-- **Scheduled:** every **30 minutes** (UTC). IST = UTC + 5:30.  
-- **Manual:** Run workflow without bootstrap anytime.
-
-**Dedup on GitHub:** `sent_corporate_actions.json` is stored in **Actions cache** between runs. To “replay” today’s alerts you must clear that cache and use an empty dedup file (see troubleshooting).
-
-**Note:** Scheduled workflows on GitHub **Free** usually require a **public** repository. Private repos need GitHub Pro for cron, or run locally.
-
-### 6. Security
-
-Never commit `.env` or tokens. If a token was ever in git, revoke it in BotFather and create a new one in GitHub Secrets only.
-
----
-
-## Run locally (optional)
-
-```bash
-python3 -m venv venv
-source venv/bin/activate   # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-cp .env.example .env       # fill in TELEGRAM_* and settings
-python dividend_bot.py --bootstrap   # first time only
-python dividend_bot.py --once        # test one cycle
-python dividend_bot.py               # continuous polling
-```
-
-Send **`/start`** to your bot in Telegram before testing.
-
----
-
-## Troubleshooting
-
-| Problem | What to try |
-|---------|-------------|
-| No Telegram messages | Check secrets; send `/start` to the bot; read the Actions log for `Telegram send failed` |
-| `0 alert(s) sent` every run | Normal if everything is already in dedup. Wait for a **new** NSE/BSE filing, or clear dedup (below) |
-| Too many alerts | Run `--bootstrap` once; set `ALERT_OTHER_CA=false`; raise `MIN_PERCENT_GAIN` |
-| Want to test alerts again | Local: set `sent_corporate_actions.json` to `{}`. GitHub: delete **Actions → Caches** for `sent-corporate-actions-v1`, then run workflow (bootstrap **off**) |
-| GitHub schedule not running | Repo must be public on Free plan, or use Pro; check Actions is enabled |
-| NSE/BSE fetch errors | Transient; next run in 30 min often works. Check logs for HTTP status |
-
----
-
-## Project layout
-
-```
-dividend-alert-bot/
-├── dividend_bot.py              # Main bot
-├── requirements.txt
-├── .env.example                 # Template for local config
-├── .env                         # Your secrets (gitignored)
-├── sent_corporate_actions.json  # Dedup state (local / cached on GitHub)
-└── .github/workflows/
-    └── corporate-action-bot.yml # 30-min cron + manual run
-```
-
----
-
-## Monorepo (bot inside a larger `Scripts` repo)
-
-Use the workflow at `Scripts/.github/workflows/dividend-alert-bot.yml` with `working-directory: dividend-alert-bot`, or copy that workflow to your repo root and adjust paths.

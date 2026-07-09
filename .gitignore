@@ -1,6 +1,9 @@
 .env
+node_modules/
+.DS_Store
 venv/
 __pycache__/
 *.pyc
-.DS_Store
 sent_dividends.json
+sent_corporate_actions.json
+package-lock.json
