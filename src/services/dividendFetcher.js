@@ -29,6 +29,11 @@ const NSE_ANN_HEADERS = {
 };
 
 const cmpCache = new Map();
+const PARALLEL = {
+  cmp: 30,
+  bseAnnPages: 5,
+  bseAnnPageBatch: 4,
+};
 
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
@@ -123,7 +128,7 @@ async function createNseSession(forAnnouncements = false) {
     : 'https://www.nseindia.com';
   try {
     await client.get(warmupUrl);
-    await sleep(500);
+    await sleep(200);
   } catch {
     // continue — some requests still work
   }
@@ -248,9 +253,9 @@ function httpGetNative(url, headers, timeoutMs = 30000) {
   });
 }
 
-async function fetchBseAnnouncementsForScrip(scripCode, fromDate, retries = 3) {
-  const url = `https://api.bseindia.com/BseIndiaAPI/api/AnnSubCategoryGetData/w?pageno=1&strCat=-1&strPrevDate=${fromDate}&strScrip=${scripCode}&strSearch=P&strType=C`;
-  for (let attempt = 0; attempt <= retries; attempt += 1) {
+async function fetchBseAnnouncementPage(fromDate, page) {
+  const url = `https://api.bseindia.com/BseIndiaAPI/api/AnnSubCategoryGetData/w?pageno=${page}&strCat=-1&strPrevDate=${fromDate}&strScrip=&strSearch=P&strType=C`;
+  for (let attempt = 0; attempt <= 2; attempt += 1) {
     try {
       let data;
       try {
@@ -260,38 +265,43 @@ async function fetchBseAnnouncementsForScrip(scripCode, fromDate, retries = 3) {
       }
       return Array.isArray(data?.Table) ? data.Table : [];
     } catch (err) {
-      if (attempt === retries) throw err;
-      await sleep(400 * (attempt + 1));
+      if (attempt === 2) throw err;
+      await sleep(300 * (attempt + 1));
     }
   }
   return [];
 }
 
-async function buildBseAnnouncementDateMap(scripCodes, endDate) {
-  const map = new Map();
+/** One bulk paginated fetch instead of per-scrip API calls */
+async function buildBseAnnouncementDateMapBulk(endDate) {
   const from = new Date(endDate);
   from.setDate(from.getDate() - 120);
   const fromDate = formatDate(from, 'yyyymmdd');
+  const map = new Map();
 
-  const entries = await runInBatches(scripCodes, 2, async (scripCode) => {
+  const pageNums = Array.from({ length: PARALLEL.bseAnnPages }, (_, i) => i + 1);
+  const pages = await runInBatches(pageNums, PARALLEL.bseAnnPageBatch, async (page) => {
     try {
-      const items = await fetchBseAnnouncementsForScrip(scripCode, fromDate);
-      const dividendAnns = items
-        .filter(isDividendAnnouncement)
-        .sort((a, b) => new Date(b.NEWS_DT || b.DissemDT).getTime() - new Date(a.NEWS_DT || a.DissemDT).getTime());
-
-      if (dividendAnns.length > 0) {
-        return [scripCode, dividendAnns[0].NEWS_DT || dividendAnns[0].DissemDT || ''];
-      }
-
+      const items = await fetchBseAnnouncementPage(fromDate, page);
+      return { page, items };
     } catch (err) {
-      console.warn(`BSE announcement lookup failed for scrip ${scripCode}:`, err.message);
+      console.warn(`BSE announcement page ${page} failed:`, err.message);
+      return { page, items: [] };
     }
-    return null;
-  }, 150);
+  });
 
-  for (const entry of entries) {
-    if (entry) map.set(entry[0], entry[1]);
+  for (const { items } of pages) {
+    for (const item of items) {
+      if (!isDividendAnnouncement(item)) continue;
+      const scrip = item.SCRIP_CD;
+      if (!scrip) continue;
+      const dt = item.NEWS_DT || item.DissemDT || '';
+      if (!dt) continue;
+      const existing = map.get(scrip);
+      if (!existing || new Date(dt) > new Date(existing)) {
+        map.set(scrip, dt);
+      }
+    }
   }
 
   return map;
@@ -307,53 +317,37 @@ function enrichBseFromAnnouncements(bseItems, announcementDateMap) {
   }
 }
 
-async function fetchBseCorporateActions(start, end) {
-  try {
-    const fd = formatDate(start, 'yyyymmdd');
-    const td = formatDate(end, 'yyyymmdd');
-    const url = `https://api.bseindia.com/BseIndiaAPI/api/DefaultData/w?strdate=${fd}&enddate=${td}&ddlcategorys=&ddlindustrys=&scripcode=&type=C`;
-    const { data } = await httpGet(url, {
-      headers: BSE_HEADERS,
-      timeout: 45000,
+async function fetchBseCorporateActionsRaw(start, end) {
+  const fd = formatDate(start, 'yyyymmdd');
+  const td = formatDate(end, 'yyyymmdd');
+  const url = `https://api.bseindia.com/BseIndiaAPI/api/DefaultData/w?strdate=${fd}&enddate=${td}&ddlcategorys=&ddlindustrys=&scripcode=&type=C`;
+  const { data } = await httpGet(url, {
+    headers: BSE_HEADERS,
+    timeout: 45000,
+  });
+  const items = Array.isArray(data) ? data : data?.Table || data?.data || [];
+
+  const results = [];
+  for (const item of items) {
+    const subject = item.Purpose || item.Remarks || '';
+    if (!isCorporateActionText(subject)) continue;
+    const symbol = item.short_name || String(item.scrip_code || '');
+    const exDate = item.Ex_date || item.exdate || '';
+    results.push({
+      exchange: 'BSE',
+      symbol,
+      company: item.long_name || item.LONG_NAME || symbol,
+      actionType: classifyAction(subject),
+      dividend: parseDividendAmount(subject),
+      exDate,
+      recordDate: item.RD_Date || '',
+      announcedAt: '',
+      rawSubject: subject,
+      source: 'corporate_action',
+      scripCode: item.scrip_code || null,
     });
-    const items = Array.isArray(data) ? data : data?.Table || data?.data || [];
-
-    const debugRaw = items.filter((item) =>
-      matchesDebugSymbol(item.short_name || item.scrip_code, item.long_name || item.LONG_NAME),
-    );
-
-    const results = [];
-    for (const item of items) {
-      const subject = item.Purpose || item.Remarks || '';
-      if (!isCorporateActionText(subject)) continue;
-      const symbol = item.short_name || String(item.scrip_code || '');
-      const exDate = item.Ex_date || item.exdate || '';
-      results.push({
-        exchange: 'BSE',
-        symbol,
-        company: item.long_name || item.LONG_NAME || symbol,
-        actionType: classifyAction(subject),
-        dividend: parseDividendAmount(subject),
-        exDate,
-        recordDate: item.RD_Date || '',
-        announcedAt: '',
-        rawSubject: subject,
-        source: 'corporate_action',
-        scripCode: item.scrip_code || null,
-      });
-    }
-
-    const scripCodes = [...new Set(
-      results.filter((r) => r.actionType === 'dividend').map((r) => r.scripCode).filter(Boolean),
-    )];
-    const announcementDateMap = await buildBseAnnouncementDateMap(scripCodes, end);
-    enrichBseFromAnnouncements(results, announcementDateMap);
-
-    return results;
-  } catch (err) {
-    console.error('BSE fetch error:', err.message);
-    return [];
   }
+  return results;
 }
 
 async function getBseCmp(scripCode) {
@@ -426,57 +420,75 @@ async function getCmp(item, nseClient) {
   const sym = String(item.symbol || '').trim().toUpperCase();
   if (!sym) return 0;
 
+  // Yahoo is fastest — try first, fall back to exchange APIs
+  const yahooPrice = await getYahooCmp(sym, item.exchange);
+  if (yahooPrice > 0) return yahooPrice;
+
   if (item.exchange === 'BSE' && item.scripCode) {
     const bsePrice = await getBseCmp(item.scripCode);
     if (bsePrice > 0) return bsePrice;
-    return getYahooCmp(sym, 'BSE');
   }
 
   if (item.exchange === 'NSE') {
     const nsePrice = await getNseCmp(sym, nseClient);
     if (nsePrice > 0) return nsePrice;
-    return getYahooCmp(sym, 'NSE');
   }
 
-  return getYahooCmp(sym, item.exchange);
+  return 0;
+}
+
+function cmpLookupKey(item) {
+  const sym = String(item.symbol || '').trim().toUpperCase();
+  if (item.exchange === 'BSE' && item.scripCode) return `BSE:${item.scripCode}`;
+  return `${item.exchange}:${sym}`;
+}
+
+async function prefetchCmps(dividends, nseClient) {
+  const uniqueByKey = new Map();
+  for (const item of dividends) {
+    const key = cmpLookupKey(item);
+    if (!uniqueByKey.has(key)) uniqueByKey.set(key, item);
+  }
+
+  const cmpByKey = new Map();
+  await runInBatches([...uniqueByKey.values()], PARALLEL.cmp, async (item) => {
+    const key = cmpLookupKey(item);
+    const cmp = await getCmp(item, nseClient);
+    cmpByKey.set(key, cmp);
+  });
+
+  return cmpByKey;
 }
 
 async function fetchDividendAlerts(config) {
   cmpCache.clear();
+  const fetchStart = Date.now();
 
   const { start, end } = announcementWindow(config.lookbackDays);
   console.log(`Fetching dividends: ${formatDate(start, 'dd-mm-yyyy')} → ${formatDate(end, 'dd-mm-yyyy')}`);
 
   const nseClient = await createNseSession(true);
-  const nseAnn = await fetchNseAnnouncements(nseClient, start, end);
-
   const calEnd = new Date(end);
   calEnd.setDate(calEnd.getDate() + 120);
-  const calendar = await fetchNseCorporateActions(nseClient, end, calEnd);
+
+  const [nseAnn, calendar, bseAnnMap, bseRaw] = await Promise.all([
+    fetchNseAnnouncements(nseClient, start, end),
+    fetchNseCorporateActions(nseClient, end, calEnd),
+    buildBseAnnouncementDateMapBulk(end),
+    fetchBseCorporateActionsRaw(start, end),
+  ]);
+
   enrichNseFromCalendar(nseAnn, calendar);
-
-  const bseItems = await fetchBseCorporateActions(start, end);
-  const allItems = [...nseAnn, ...bseItems];
-
-  const debugNseAnn = nseAnn.filter((item) => matchesDebugSymbol(item.symbol, item.company));
-  const debugBse = bseItems.filter((item) => matchesDebugSymbol(item.symbol, item.company));
-  const debugCalendar = Object.entries(calendar)
-    .filter(([symbol]) => matchesDebugSymbol(symbol))
-    .flatMap(([, entries]) => entries);
-
+  enrichBseFromAnnouncements(bseRaw, bseAnnMap);
+  const allItems = [...nseAnn, ...bseRaw];
 
   const dividends = allItems.filter((item) => item.actionType === 'dividend');
-
-  const cmpByItem = new Map();
-  await runInBatches(dividends, 8, async (item) => {
-    const cmp = await getCmp(item, nseClient);
-    cmpByItem.set(item, cmp);
-  });
+  const cmpByKey = await prefetchCmps(dividends, nseClient);
 
   const results = [];
 
   for (const item of dividends) {
-    const cmp = cmpByItem.get(item) || 0;
+    const cmp = cmpByKey.get(cmpLookupKey(item)) || 0;
     let yieldPct = 0;
     if (item.dividend > 0 && cmp > 0) {
       yieldPct = (item.dividend / cmp) * 100;
@@ -496,9 +508,8 @@ async function fetchDividendAlerts(config) {
     results.push(record);
   }
 
-  const debugFinal = results.filter((item) => matchesDebugSymbol(item.symbol, item.company));
-
-  console.log(`Fetched ${results.length} dividend alert(s)`);
+  const elapsed = ((Date.now() - fetchStart) / 1000).toFixed(1);
+  console.log(`Fetched ${results.length} dividend alert(s) in ${elapsed}s`);
   return results;
 }
 
