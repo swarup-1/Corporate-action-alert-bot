@@ -6,3 +6,4 @@ __pycache__/
 *.pyc
 sent_dividends.json
 sent_corporate_actions.json
+.cache/

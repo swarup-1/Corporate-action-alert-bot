@@ -4,8 +4,8 @@
   "description": "Express + MongoDB API for dividend alerts",
   "main": "src/server.js",
   "scripts": {
-    "dev": "node --watch src/server.js",
-    "start": "node src/server.js",
+    "dev": "node --watch --insecure-http-parser src/server.js",
+    "start": "node --insecure-http-parser src/server.js",
     "test:db": "node src/scripts/test-db.js",
     "vercel-build": "echo 'No build step required'"
   },
